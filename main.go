@@ -12,4 +12,6 @@ func main() {
 	server.HandleFunc("/products", productsHandler)
 
 	log.Fatal(http.ListenAndServe(":8080", server))
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds | log.Lshortfile)
+
 }
