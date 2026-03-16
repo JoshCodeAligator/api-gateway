@@ -7,6 +7,12 @@ import (
 )
 
  func usersHandler(w http.ResponseWriter, r *http.Request) {
+ 	if !usersLimiter.Allow() {
+ 		log.Println("Rate limit exceeded")
+ 		errorHandler(w, http.StatusTooManyRequests, "Rate limit exceeded")
+ 		return
+ 	}
+    
  	log.Println("Received request for /users")
  	// Handle requests for /users route
  	if r.Method != "GET" {
