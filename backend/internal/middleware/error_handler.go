@@ -1,5 +1,4 @@
-package main
-
+package middleware
 import (
 	"encoding/json"
 	"fmt"

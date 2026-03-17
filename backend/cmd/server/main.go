@@ -1,21 +1,25 @@
 package main
 
 import (
-	"golang.org/x/time/rate"
-	"log"
-	"net/http"
+	"myproject/internal/middleware"
+	"myproject/internal/handlers"
+	"github.com/gin-gonic/gin"
 )
-var usersLimiter = rate.NewLimiter(rate.Limit(1), 3)
-var productsLimiter = rate.NewLimiter(rate.Limit(2), 5)
-
 
 func main() {
-	server := http.NewServeMux()
 
-	server.HandleFunc("/users", usersHandler)
-	server.HandleFunc("/products", productsHandler)
+	router := gin.Default()
 
-	log.Fatal(http.ListenAndServe(":8080", server))
-	log.SetFlags(log.LstdFlags | log.Lmicroseconds | log.Lshortfile)
+	router.GET("/health", handlers.HealthCheck)
 
+	router.POST("/apikey", handlers.CreateKey)
+
+	api := router.Group("/api")
+
+	api.Use(middleware.APIKeyAuthMiddleware())
+	api.Use(middleware.RateLimitMiddleware(100))
+
+	api.GET("/data", handlers.ProtectedData)
+
+	router.Run(":8080")
 }
