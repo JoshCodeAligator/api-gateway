@@ -1,12 +1,15 @@
 package main
 
 import (
-	"myproject/internal/middleware"
+	"myproject/internal/database"
 	"myproject/internal/handlers"
+	"myproject/internal/middleware"
+
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	database.ConnectDatabase()
 
 	router := gin.Default()
 
@@ -17,7 +20,7 @@ func main() {
 	api := router.Group("/api")
 
 	api.Use(middleware.APIKeyAuthMiddleware())
-	api.Use(middleware.RateLimitMiddleware(100))
+	api.Use(middleware.RateLimiter(100))
 
 	api.GET("/data", handlers.ProtectedData)
 

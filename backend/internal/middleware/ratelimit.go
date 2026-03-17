@@ -1,28 +1,49 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
-	"sync"
+	"time"
+
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 )
 
-var requests = make(map[string]int)
-var mu sync.Mutex
+var ctx = context.Background()
 
-func RateLimitMiddleware(maxRequests int) gin.HandlerFunc {
+var redisClient = redis.NewClient(&redis.Options{
+	Addr: "localhost:6379",
+})
+
+func RateLimiter(limit int) gin.HandlerFunc {
+
 	return func(c *gin.Context) {
+
 		ip := c.ClientIP()
 
-		mu.Lock()
-		requests[ip]++
-		count := requests[ip]
-		mu.Unlock()
+		key := "rate:" + ip
 
-		if count > maxRequests {
-			c.JSON(http.StatusTooManyRequests, gin.H{"error": "Rate limit exceeded"})
+		count, err := redisClient.Incr(ctx, key).Result()
+
+		if err != nil {
+			c.Next()
+			return
+		}
+
+		if count == 1 {
+			redisClient.Expire(ctx, key, time.Minute)
+		}
+
+		if count > int64(limit) {
+
+			c.JSON(http.StatusTooManyRequests, gin.H{
+				"error": "rate limit exceeded",
+			})
+
 			c.Abort()
 			return
 		}
+
 		c.Next()
 	}
 }
