@@ -15,19 +15,26 @@ export default function ApiKeyGenerator() {
     try {
       const data = await createApiKey(owner);
       setApiKey(data.api_key);
-    } catch (err) {
-      console.error(err);
+      localStorage.setItem("apiKey", data.api_key); // 🔥 nice UX
+    } catch {
       alert("Failed to create key");
     }
     setLoading(false);
   }
 
+  function copyKey() {
+    navigator.clipboard.writeText(apiKey);
+  }
+
   return (
-    <div className="bg-white p-6 rounded-xl shadow w-full max-w-md">
-      <h2 className="text-lg font-semibold mb-4">Generate API Key</h2>
+    <div className="card max-w-md w-full">
+      <h2 className="text-xl font-semibold mb-2">Generate API Key</h2>
+      <p className="text-sm text-gray-500 mb-6">
+        Create a key to access protected endpoints.
+      </p>
 
       <input
-        className="border rounded p-2 w-full mb-3"
+        className="input mb-4"
         placeholder="Owner name"
         value={owner}
         onChange={(e) => setOwner(e.target.value)}
@@ -35,15 +42,27 @@ export default function ApiKeyGenerator() {
 
       <button
         onClick={handleCreate}
-        className="bg-blue-600 text-white w-full py-2 rounded"
+        className="button button-primary"
       >
         {loading ? "Creating..." : "Create Key"}
       </button>
 
       {apiKey && (
-        <div className="mt-4 bg-gray-100 p-3 rounded">
-          <p className="text-sm mb-1">API Key:</p>
-          <code className="text-blue-700 break-all">{apiKey}</code>
+        <div className="mt-6 bg-gray-100 p-4 rounded-lg">
+          <p className="text-xs text-gray-500 mb-1">Your API Key</p>
+
+          <div className="flex items-center justify-between gap-2">
+            <code className="text-blue-700 break-all text-sm">
+              {apiKey}
+            </code>
+
+            <button
+              onClick={copyKey}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Copy
+            </button>
+          </div>
         </div>
       )}
     </div>

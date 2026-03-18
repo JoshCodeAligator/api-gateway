@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL!;
+const BASE_URL = "http://localhost:8080";
 
 export async function createApiKey(owner: string) {
   const res = await fetch(`${BASE_URL}/apikey`, {
@@ -9,14 +9,22 @@ export async function createApiKey(owner: string) {
     body: JSON.stringify({ owner }),
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text);
-  }
+  if (!res.ok) throw new Error("Failed to create key");
 
-  return res.json() as Promise<{ api_key: string }>;
+  return res.json();
 }
 
+export async function callProtected(apiKey: string) {
+  const res = await fetch(`${BASE_URL}/api/data`, {
+    headers: {
+      "x-api-key": apiKey,
+    },
+  });
+
+  if (!res.ok) throw new Error("Unauthorized");
+
+  return res.json();
+}
 export async function getProtectedData(apiKey: string) {
   const res = await fetch(`${BASE_URL}/api/data`, {
     method: "GET",

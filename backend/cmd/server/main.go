@@ -6,6 +6,8 @@ import (
 	"myproject/internal/middleware"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
+
 )
 
 func main() {
@@ -13,8 +15,9 @@ func main() {
 
 	router := gin.Default()
 
+	router.Use(cors.Default())
+	
 	router.GET("/health", handlers.HealthCheck)
-
 	router.POST("/apikey", handlers.CreateKey)
 
 	api := router.Group("/api")
