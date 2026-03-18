@@ -1,12 +1,12 @@
 import Navbar from "@/components/Navbar";
-import ApiKeyGenerator from "@/components/ApiKeyGenerator";
+import ProtectedTester from "@/components/ProtectedTester";
 
-export default function Home() {
+export default function Dashboard() {
   return (
     <>
       <Navbar />
       <main className="flex justify-center items-center min-h-[80vh]">
-        <ApiKeyGenerator />
+        <ProtectedTester />
       </main>
     </>
   );
