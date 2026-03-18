@@ -8,8 +8,13 @@ CREATE TABLE api_keys (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-# To run the server:
+# To run the GO server:
+cd backend/cmd/server
 go run main.go
+
+# To access PostgreSQL database:
+brew services start postgresql
+psql postgres
 
 # To run the tests:
 brew install httpie   # on macOS
